@@ -31,7 +31,7 @@ const swaggerOptions = {
             contact: {
                 name: 'Pedro Melo'
             },
-            servers: ['http://localhost:5000']
+            servers: ['http://localhost:5000', 'https://rocky-depths-14254.herokuapp.com/']
         }
     },
     // ['routes/*.js']
