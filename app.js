@@ -15,6 +15,7 @@ const userRoutes = require('./routes/users')
 
 //bodyParser middleware
 app.use(express.json())
+app.use(cors());
 
 const port = process.env.PORT || 5000
 
