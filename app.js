@@ -13,7 +13,7 @@ const swaggerUi = require('swagger-ui-express')
 const schedulesRoutes = require('./routes/schedules')
 const userRoutes = require('./routes/users')
 
-//bodyParser middleware
+//bodyParser/cors middleware
 app.use(express.json())
 app.use(cors());
 

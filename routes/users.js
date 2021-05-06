@@ -1,13 +1,12 @@
 const express = require('express')
 const bcrypt = require("bcrypt");
 const router = express.Router()
+const utils = require('../services/utils')
 
 // posts Model
 const User = require('../models/User')
 
-
 // Routes
-
 /**
  * @swagger
  * /all-users:
@@ -70,21 +69,23 @@ const User = require('../models/User')
  */
  router.post('/signup', async (req, res) => { 
     const body = req.body
-    const { name, email, username, password, birthdate, cpf } = body
+    const { name, email, username, password, birthdate, cpf, admin = false } = body
     if(!(name && email && username && password && birthdate && cpf)){
         return res.status(400).send({error: 'Invalid body'})
     }
-
+    
     const hasUser = await User.findOne({email: email})
     const hasCPF = await User.findOne({cpf: cpf})
     if(hasUser || hasCPF){
         return res.status(400).send({error: 'User already exists'})
     }
 
-    const user = new User(body)
+    const token = utils.generateJwt({...body, admin})
+    const newBody = {...body, token}
+    const user = new User(newBody)
     const salt = await bcrypt.genSalt(10)
     user.password = await bcrypt.hash(user.password, salt)
-    user.save().then((doc) => res.status(200).send(doc))
+    user.save().then((doc) => res.status(200).json({success: true}))
 })
 
 /**
@@ -118,7 +119,7 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({username: body.username})
     if(user){
         const validPassword = await bcrypt.compare(body.password, user.password)
-        validPassword ? res.status(200).json({success: true}) : res.status(400).json({error: 'Invalid password'})
+        validPassword ? res.status(200).json({token: user.token}) : res.status(400).json({error: 'Invalid password'})
     } else {
         res.status(404).json({error: 'User not found'})
     }
