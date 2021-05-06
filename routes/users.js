@@ -74,9 +74,9 @@ const User = require('../models/User')
     if(!(name && email && username && password && birthdate && cpf)){
         return res.status(400).send({error: 'Invalid body'})
     }
-    
+
     const hasUser = await User.findOne({email: email})
-    const hasCPF = await User.findOne({email: email})
+    const hasCPF = await User.findOne({cpf: cpf})
     if(hasUser || hasCPF){
         return res.status(400).send({error: 'User already exists'})
     }
