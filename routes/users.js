@@ -45,12 +45,24 @@ const User = require('../models/User')
  *              - userDto
  *          schema:
  *            required:
- *              - user
+ *              - name
+ *              - email
+ *              - username
  *              - password
+ *              - birthdate
+ *              - cpf
  *            properties:
- *              user:
+ *              name:
+ *                type: string
+ *              email:
+ *                type: string
+ *              username:
  *                type: string
  *              password:
+ *                type: string
+ *              birthdate:
+ *                type: string
+ *              cpf:
  *                type: string
  *      responses: 
  *          '200':
@@ -58,7 +70,8 @@ const User = require('../models/User')
  */
  router.post('/signup', async (req, res) => { 
     const body = req.body
-    if(!(body.user && body.password)){
+    const { name, email, username, password, birthdate, cpf } = body
+    if(!(name && email && username && password && birthdate && cpf)){
         return res.status(400).send({error: 'Invalid body'})
     }
 
@@ -83,10 +96,10 @@ const User = require('../models/User')
  *              - userDto
  *          schema:
  *            required:
- *              - user
+ *              - username
  *              - password
  *            properties:
- *              user:
+ *              username:
  *                type: string
  *              password:
  *                type: string
@@ -96,12 +109,12 @@ const User = require('../models/User')
  */
 router.post('/login', async (req, res) => {
     const body = req.body
-    const user = await User.findOne({email: body.email})
+    const user = await User.findOne({username: body.username})
     if(user){
         const validPassword = await bcrypt.compare(body.password, user.password)
         validPassword ? res.status(200).json({success: true}) : res.status(400).json({error: 'Invalid password'})
     } else {
-        res.status(401).json({error: 'User not found'})
+        res.status(404).json({error: 'User not found'})
     }
 })
 
