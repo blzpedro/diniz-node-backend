@@ -53,6 +53,13 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use('/', schedulesRoutes)
 app.use('/', userRoutes)
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
+    app.use(cors());
+    next();
+});
+
 app.listen(port, () => {
     console.log(`rodando server na porta ${port}`)
 })
