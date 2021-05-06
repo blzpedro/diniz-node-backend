@@ -74,6 +74,12 @@ const User = require('../models/User')
     if(!(name && email && username && password && birthdate && cpf)){
         return res.status(400).send({error: 'Invalid body'})
     }
+    
+    const hasUser = await User.findOne({email: email})
+    const hasCPF = await User.findOne({email: email})
+    if(hasUser || hasCPF){
+        return res.status(400).send({error: 'User already exists'})
+    }
 
     const user = new User(body)
     const salt = await bcrypt.genSalt(10)

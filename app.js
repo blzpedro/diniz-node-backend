@@ -1,6 +1,6 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
-
 // mongoDB
 const mongoose = require('mongoose')
 const { MONGO_URI } = require('./config')
