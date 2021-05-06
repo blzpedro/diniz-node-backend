@@ -19,7 +19,7 @@ const User = require('../models/User')
  *          '200':
  *              description: 'Success response'
  */
- router.get('/all-users', async (req, res) => { 
+ router.get('/all-users', utils.adminJwt, async (req, res) => { 
     try {
         const users = await User.find()
         if(!users) throw Error('Error to get all users.')        

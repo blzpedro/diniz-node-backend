@@ -4,7 +4,6 @@ const app = express()
 // mongoDB
 const mongoose = require('mongoose')
 const { MONGO_URI } = require('./config')
-
 // swagger
 const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
