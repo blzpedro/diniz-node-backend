@@ -24,7 +24,7 @@ mongoose.connect(MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true})
 
 // https://swagger.io/specification/#infoObject
 const swaggerOptions = {
-    swaggerDefinition: {
+    swaggerDefinition: {        
         info: {
             title: 'Diniz API',
             description: 'Diniz API Information',
@@ -32,9 +32,21 @@ const swaggerOptions = {
                 name: 'Pedro Melo'
             },
             servers: ['http://localhost:5000', 'https://diniz-api.herokuapp.com/']
+        },
+    },
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: "http",
+                in: "header",
+                scheme: "bearer",
+                bearerFormat: "JWT"
+            },
         }
     },
-    // ['routes/*.js']
+    security: [{ 
+        bearerAuth: [] 
+    }],
     apis: ['routes/*.js']
 }
 

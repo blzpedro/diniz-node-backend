@@ -1,6 +1,13 @@
 const express = require('express')
 const bcrypt = require("bcrypt");
 const router = express.Router()
+
+//validators
+const moment = require('moment')
+const emailValidator = require("email-validator");
+const { cpf } = require("cpf-cnpj-validator")
+const cpfValidator = cpf
+
 const utils = require('../services/utils')
 
 // posts Model
@@ -70,13 +77,25 @@ const User = require('../models/User')
  router.post('/signup', async (req, res) => { 
     const body = req.body
     const { name, email, username, password, birthdate, cpf, admin = false } = body
+    const validBirthdate = moment(birthdate, "DD/MM/YYYY").isValid()
+    const validEmail = emailValidator.validate(email)
+    const validCpf = cpfValidator.isValid(cpf)
     if(!(name && email && username && password && birthdate && cpf)){
         return res.status(400).send({error: 'Invalid body'})
     }
+    if(!validBirthdate){
+        return res.status(400).send({error: 'Invalid birthdate'})
+    }
+    if(!validEmail){
+        return res.status(400).send({error: 'Invalid email'})
+    }
+    if(!validCpf){
+        return res.status(400).send({error: 'Invalid cpf'})
+    }
     
-    const hasUser = await User.findOne({email: email})
+    const hasEmail = await User.findOne({email: email})
     const hasCPF = await User.findOne({cpf: cpf})
-    if(hasUser || hasCPF){
+    if(hasEmail || hasCPF){
         return res.status(400).send({error: 'User already exists'})
     }
 
@@ -144,7 +163,7 @@ router.post('/login', async (req, res) => {
  *          '200':
  *              description: 'Success response'
  */
- router.delete('/user/:id', async (req, res) => { 
+ router.delete('/user/:id', utils.adminJwt, async (req, res) => { 
     try {
        const user = await User.findByIdAndDelete(req.params.id)
        if(!user) throw Error('User not found.')       

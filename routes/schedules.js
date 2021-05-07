@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const utils = require('../services/utils')
+const moment = require('moment')
 
 // schedules Model
 const Schedules = require('../models/Schedules')
@@ -18,9 +20,9 @@ const Schedules = require('../models/Schedules')
  *        - application/json
  *      parameters:
  *        - in: body
- *          name: postDto
+ *          name: scheduleDto
  *          required: 
- *              - postDto
+ *              - scheduleDto
  *          schema:
  *            required:
  *              - title
@@ -36,7 +38,7 @@ const Schedules = require('../models/Schedules')
  *          '200':
  *              description: 'Success response'
  */
-router.post('/schedule', async (req, res) => { 
+router.post('/schedule', utils.adminJwt, async (req, res) => { 
     const newSchedule = new Schedules(req.body)
     try {
         const schedule = await newSchedule.save()
