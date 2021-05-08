@@ -24,29 +24,33 @@ mongoose.connect(MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true})
 
 // https://swagger.io/specification/#infoObject
 const swaggerOptions = {
-    swaggerDefinition: {        
-        info: {
-            title: 'Diniz API',
-            description: 'Diniz API Information',
+    definition: {  
+        openapi: '3.0.1',  
+        info: {            
+            swagger: '2.0',
+            version: "1.0.0",
+            title: "Diniz API",
+            description: "Rest API to control Diniz Barber Shop",
             contact: {
-                name: 'Pedro Melo'
+                name: "Pedro Melo",
+                url: "https://github.com/blzpedro",
+                email: "phenriqmelo99@gmail.com",
             },
             servers: ['http://localhost:5000', 'https://diniz-api.herokuapp.com/']
         },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "apiKey",
+                    in: "header",
+                    name: "Authorization",
+                },
+            }
+        },
+        security: [{ 
+            bearerAuth: [] 
+        }],
     },
-    components: {
-        securitySchemes: {
-            bearerAuth: {
-                type: "http",
-                in: "header",
-                scheme: "bearer",
-                bearerFormat: "JWT"
-            },
-        }
-    },
-    security: [{ 
-        bearerAuth: [] 
-    }],
     apis: ['routes/*.js']
 }
 
