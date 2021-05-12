@@ -44,32 +44,25 @@ const User = require('../models/User')
  *      - Users
  *      description: Create new account
  *      summary: Create new account
- *      parameters:
- *        - in: body
- *          name: userDto
- *          required: 
- *              - userDto
- *          schema:
- *            required:
- *              - name
- *              - email
- *              - username
- *              - password
- *              - birthdate
- *              - cpf
- *            properties:
- *              name:
- *                type: string
- *              email:
- *                type: string
- *              username:
- *                type: string
- *              password:
- *                type: string
- *              birthdate:
- *                type: string
- *              cpf:
- *                type: string
+ *      requestBody:
+ *          required: true
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  name:
+ *                    type: string
+ *                  email:
+ *                    type: string
+ *                  username:
+ *                    type: string
+ *                  password:
+ *                    type: string
+ *                  birthdate:
+ *                    type: string
+ *                  cpf:
+ *                    type: string
  *      responses: 
  *          '200':
  *              description: 'Success response'
@@ -89,9 +82,9 @@ const User = require('../models/User')
     if(!validEmail){
         return res.status(400).send({error: 'Invalid email'})
     }
-    if(!validCpf){
-        return res.status(400).send({error: 'Invalid cpf'})
-    }
+    // if(!validCpf){
+    //     return res.status(400).send({error: 'Invalid cpf'})
+    // }
     
     const hasEmail = await User.findOne({email: email})
     const hasCPF = await User.findOne({cpf: cpf})
@@ -115,20 +108,19 @@ const User = require('../models/User')
  *      - Users
  *      description: Login with user
  *      summary: Login with user
- *      parameters:
- *        - in: body
- *          name: userDto
- *          required: 
- *              - userDto
- *          schema:
- *            required:
- *              - username
- *              - password
- *            properties:
- *              username:
- *                type: string
- *              password:
- *                type: string
+ *      requestBody:
+ *          required: true
+ *          content:
+ *            application/json:
+ *              schema:
+ *                required:
+ *                  - username
+ *                  - password
+ *                properties:
+ *                  username:
+ *                    type: string
+ *                  password:
+ *                    type: string
  *      responses: 
  *          '200':
  *              description: 'Success response'

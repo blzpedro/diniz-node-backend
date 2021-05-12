@@ -18,15 +18,15 @@ const Schedules = require('../models/Schedules')
  *      summary: Create new schedule
  *      consumes:
  *        - application/json
- *      parameters:
- *        - in: body
- *          name: scheduleDto
- *          required: 
- *              - scheduleDto
+ *      requestBody:
+ *          required: true
+ *          content:
+ *            application/json:
  *          schema:
  *            required:
  *              - title
  *              - body
+ *              - date
  *            properties:
  *              title:
  *                type: string
@@ -40,6 +40,10 @@ const Schedules = require('../models/Schedules')
  */
 router.post('/schedule', utils.adminJwt, async (req, res) => { 
     const newSchedule = new Schedules(req.body)
+    const validDate = moment(newSchedule.date, "DD/MM/YYYY").isSameOrAfter() 
+    if(!validDate){
+        return res.status(400).send({error: 'Invalid date'})
+    }
     try {
         const schedule = await newSchedule.save()
         if(!schedule) throw Error('Error creating a schedule.')        
@@ -111,22 +115,21 @@ router.post('/schedule', utils.adminJwt, async (req, res) => {
  *          schema: 
  *              type: string
  *          description: The schedule id
- *        - in: body
- *          name: scheduleDto
- *          required: 
- *              - scheduleDto
- *          description: The schedule to create.
- *          schema:
- *            required:
- *              - title
- *              - body
- *            properties:
- *              title:
- *                type: string
- *              body:
- *                type: string
- *              date:
- *                type: string
+ *      requestBody:
+ *          required: true
+ *          content:
+ *            application/json:
+ *              schema:
+ *                required:
+ *                  - title
+ *                  - body
+ *                properties:
+ *                  title:
+ *                    type: string
+ *                  body:
+ *                    type: string
+ *                  date:
+ *                    type: string
  *      tags: 
  *      - Schedules
  *      description: Edit schedule

@@ -25,9 +25,8 @@ mongoose.connect(MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true})
 // https://swagger.io/specification/#infoObject
 const swaggerOptions = {
     definition: {  
-        openapi: '3.0.1',  
+        openapi: '3.0.0',  
         info: {            
-            swagger: '2.0',
             version: "1.0.0",
             title: "Diniz API",
             description: "Rest API to control Diniz Barber Shop",
@@ -41,14 +40,15 @@ const swaggerOptions = {
         components: {
             securitySchemes: {
                 bearerAuth: {
-                    type: "apiKey",
-                    in: "header",
-                    name: "Authorization",
+                    type: 'apiKey',
+                    name: 'Authorization',
+                    scheme: 'bearer',
+                    in: 'header',
                 },
             }
         },
         security: [{ 
-            bearerAuth: [] 
+            bearerAuth: [], 
         }],
     },
     apis: ['routes/*.js']
@@ -70,8 +70,11 @@ app.use('/', schedulesRoutes)
 app.use('/', userRoutes)
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
+    console.log('75', req)
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('accept', 'application/json');
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
     app.use(cors());
     next();
 });
