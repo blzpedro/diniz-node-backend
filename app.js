@@ -70,9 +70,6 @@ app.use('/', schedulesRoutes)
 app.use('/', userRoutes)
 
 app.use((req, res, next) => {
-    console.log('75', req)
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('accept', 'application/json');
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
     app.use(cors());

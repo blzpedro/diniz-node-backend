@@ -22,28 +22,38 @@ const Schedules = require('../models/Schedules')
  *          required: true
  *          content:
  *            application/json:
- *          schema:
- *            required:
- *              - title
- *              - body
- *              - date
- *            properties:
- *              title:
- *                type: string
- *              body:
- *                type: string
- *              date:
- *                type: string
+ *              schema:
+ *               required:
+ *                 - date
+ *                 - hour
+ *               properties:
+ *                 date:
+ *                   type: string
+ *                 hour:
+ *                   type: string
  *      responses: 
  *          '200':
  *              description: 'Success response'
  */
 router.post('/schedule', utils.adminJwt, async (req, res) => { 
-    const newSchedule = new Schedules(req.body)
-    const validDate = moment(newSchedule.date, "DD/MM/YYYY").isSameOrAfter() 
+    const { date, hour } = req.body
+    const validDate = moment(date, "DD/MM/YYYY").isSameOrAfter() 
+    const validHour = /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test(hour)
     if(!validDate){
         return res.status(400).send({error: 'Invalid date'})
     }
+    if(!validHour){
+        return res.status(400).send({error: 'Invalid hour'})
+    }
+
+    const searchDay = await Schedules.find({date})
+    if(searchDay){
+        const sameHour = searchDay.some(day => day.hour == hour)
+        if(sameHour){
+            return res.status(400).send({error: 'Hour already exists'})
+        }
+    }
+    const newSchedule = new Schedules(req.body)
     try {
         const schedule = await newSchedule.save()
         if(!schedule) throw Error('Error creating a schedule.')        
@@ -94,7 +104,7 @@ router.post('/schedule', utils.adminJwt, async (req, res) => {
  *          '200':
  *              description: 'Success response'
  */
- router.delete('/schedule/:id', async (req, res) => { 
+ router.delete('/schedule/:id', utils.adminJwt, async (req, res) => { 
      try {
         const schedule = await Schedules.findByIdAndDelete(req.params.id)
         if(!schedule) throw Error('Post not found.')       
@@ -115,21 +125,21 @@ router.post('/schedule', utils.adminJwt, async (req, res) => {
  *          schema: 
  *              type: string
  *          description: The schedule id
+ *      consumes:
+ *        - application/json
  *      requestBody:
  *          required: true
  *          content:
  *            application/json:
  *              schema:
- *                required:
- *                  - title
- *                  - body
- *                properties:
- *                  title:
- *                    type: string
- *                  body:
- *                    type: string
- *                  date:
- *                    type: string
+ *               required:
+ *                 - date
+ *                 - hour
+ *               properties:
+ *                 date:
+ *                   type: string
+ *                 hour:
+ *                   type: string
  *      tags: 
  *      - Schedules
  *      description: Edit schedule
@@ -138,7 +148,25 @@ router.post('/schedule', utils.adminJwt, async (req, res) => {
  *          '200':
  *              description: 'Success response'
  */
-router.put('/schedule/:id', async (req, res) => {
+router.put('/schedule/:id', utils.adminJwt, async (req, res) => {
+    const { date, hour } = req.body
+    const validDate = moment(date, "DD/MM/YYYY").isSameOrAfter() 
+    const validHour = /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test(hour)
+    if(!validDate){
+        return res.status(400).send({error: 'Invalid date'})
+    }
+    if(!validHour){
+        return res.status(400).send({error: 'Invalid hour'})
+    }
+
+    const searchDay = await Schedules.find({date})
+    if(searchDay){
+        const sameHour = searchDay.some(day => day.hour == hour)
+        if(sameHour){
+            return res.status(400).send({error: 'Same hour'})
+        }
+    } 
+
     try {
        const schedule = await Schedules.findByIdAndUpdate(req.params.id, req.body)
        if(!schedule) throw Error('Error to update schedule.')       
@@ -170,7 +198,7 @@ router.put('/schedule/:id', async (req, res) => {
  router.get('/schedule/:id', async (req, res) => { 
      try {
         const schedule = await Schedules.findById(req.params.id)
-        if(!schedule) throw Error('Post not found.')       
+        if(!schedule) throw Error('Schedule not found.')       
         res.status(200).json(schedule)                 
      } catch (err) {
         res.status(400).json({msg: err})                
